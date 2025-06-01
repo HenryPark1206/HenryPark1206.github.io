@@ -6,28 +6,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
       color: #333;
     }
+
     header {
+      background-color: #007acc;
+      color: white;
+      padding: 40px 20px;
       text-align: center;
-      padding: 20px;
+      position: relative;
     }
+
+    header::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 30px;
+      background: linear-gradient(to right, #007acc 50%, #f9f9f9 50%);
+      background-size: 20px 100%;
+    }
+
     nav a {
       margin: 0 15px;
       text-decoration: none;
-      color: #007acc;
+      color: white;
+      font-weight: bold;
     }
+
     section {
-      margin-top: 40px;
+      max-width: 800px;
+      margin: 60px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: relative;
     }
+
+    section::before {
+      content: "";
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background-color: #007acc;
+      border-radius: 2px;
+    }
+
+    h2 {
+      border-bottom: 2px solid #007acc;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    ul {
+      list-style-type: square;
+      padding-left: 20px;
+    }
+
     footer {
-      margin-top: 60px;
       text-align: center;
+      padding: 40px 10px;
       font-size: 0.9em;
-      color: #666;
+      color: #777;
+      border-top: 1px solid #ccc;
+      margin-top: 60px;
     }
   </style>
 </head>
@@ -38,30 +86,24 @@
     <nav>
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
     </nav>
   </header>
 
   <section id="about">
     <h2>About Me</h2>
-    <p>This is a short description about me. I love coding and open-source projects!</p>
+    <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design. I love working on web projects and collaborating with the tech community.</p>
   </section>
 
   <section id="projects">
     <h2>Projects</h2>
     <ul>
-      <li><a href="https://github.com/yourusername/project1">Project 1</a></li>
-      <li><a href="https://github.com/yourusername/project2">Project 2</a></li>
+      <li><a href="https://github.com/yourusername/project1">Project 1</a> – A cool tool I built to automate tasks.</li>
+      <li><a href="https://github.com/yourusername/project2">Project 2</a> – A lightweight framework for fast UI development.</li>
     </ul>
   </section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>You can reach me at: yourname@example.com</p>
-  </section>
-
   <footer>
-    &copy; 2025 Your Name
+    &copy; 2025 Your Name – Built with GitHub Pages
   </footer>
 
 </body>
