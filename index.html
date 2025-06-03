@@ -64,16 +64,9 @@
       position: relative;
     }
 
+    /* Removed the blue bar */
     section::before {
-      content: "";
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 4px;
-      background-color: #007acc;
-      border-radius: 2px;
+      display: none;
     }
 
     h2 {
@@ -118,6 +111,12 @@
 
     button:hover {
       background-color: #005fa3;
+    }
+
+    #postsContainer {
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 10px;
     }
 
     .post {
