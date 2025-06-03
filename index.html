@@ -20,7 +20,9 @@
       position: relative;
     }
 
-
+    nav {
+      margin-top: 10px;
+    }
 
     nav a {
       margin: 0 15px;
@@ -70,6 +72,58 @@
       border-top: 1px solid #ccc;
       margin-top: 60px;
     }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="text"],
+    textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    input[type="file"] {
+      padding: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .post {
+      margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+
+    .post img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .timestamp {
+      font-size: 0.85em;
+      color: #888;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -79,6 +133,7 @@
     <nav>
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
+      <a href="#post">Post</a>
     </nav>
   </header>
 
@@ -95,9 +150,68 @@
     </ul>
   </section>
 
+  <section id="post">
+    <h2>Create a Post</h2>
+    <form id="postForm">
+      <input type="text" id="postTitle" placeholder="Post Title" required>
+      <textarea id="postContent" rows="5" placeholder="Write something..." required></textarea>
+      <input type="file" id="postImage" accept="image/*">
+      <button type="submit">Publish</button>
+    </form>
+
+    <div id="postsContainer"></div>
+  </section>
+
   <footer>
     &copy; 2025 Henry Park – Built with GitHub Pages
   </footer>
+
+  <script>
+    const form = document.getElementById('postForm');
+    const postsContainer = document.getElementById('postsContainer');
+
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('postTitle').value;
+      const content = document.getElementById('postContent').value;
+      const imageInput = document.getElementById('postImage');
+      const time = new Date().toLocaleString();
+
+      const postDiv = document.createElement('div');
+      postDiv.className = 'post';
+
+      const titleEl = document.createElement('h3');
+      titleEl.textContent = title;
+
+      const contentEl = document.createElement('p');
+      contentEl.textContent = content;
+
+      const timestamp = document.createElement('div');
+      timestamp.className = 'timestamp';
+      timestamp.textContent = `Posted on ${time}`;
+
+      postDiv.appendChild(titleEl);
+      postDiv.appendChild(contentEl);
+
+      if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          postDiv.appendChild(img);
+          postDiv.appendChild(timestamp);
+          postsContainer.prepend(postDiv);
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        postDiv.appendChild(timestamp);
+        postsContainer.prepend(postDiv);
+      }
+
+      form.reset();
+    });
+  </script>
 
 </body>
 </html>
