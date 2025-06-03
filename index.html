@@ -11,8 +11,6 @@
       margin: 0;
       background-color: #f9f9f9;
       color: #333;
-      display: flex;
-      flex-direction: column;
     }
 
     header {
@@ -33,28 +31,35 @@
       font-weight: bold;
     }
 
-    .container {
+    .page-content {
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: center;
+      gap: 40px;
       padding: 40px 5%;
     }
 
-    .left-section {
-      flex: 0 0 45%;
-      max-width: 600px;
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
     }
 
-    .right-section {
-      flex: 0 0 50%;
-      max-width: 1000px;
+    .left-column {
+      flex: 1;
+      max-width: 500px;
+    }
+
+    .right-column {
+      flex: 1.5;
+      max-width: 900px;
     }
 
     section {
       background: white;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 40px;
       padding: 20px;
       position: relative;
     }
@@ -161,18 +166,18 @@
       font-size: 0.9em;
       color: #777;
       border-top: 1px solid #ccc;
-      margin-top: 60px;
+      margin-top: 40px;
     }
 
     @media screen and (max-width: 900px) {
-      .container {
+      .page-content {
         flex-direction: column;
         align-items: center;
       }
-      .left-section,
-      .right-section {
-        flex: 0 0 100%;
+
+      .left-column, .right-column {
         max-width: 90%;
+        width: 100%;
       }
     }
   </style>
@@ -188,8 +193,8 @@
     </nav>
   </header>
 
-  <div class="container">
-    <div class="left-section">
+  <div class="page-content">
+    <div class="left-column">
       <section id="about">
         <h2>About Me</h2>
         <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design. I love working on web projects and collaborating with the tech community.</p>
@@ -204,7 +209,7 @@
       </section>
     </div>
 
-    <div class="right-section">
+    <div class="right-column">
       <section id="post">
         <h2>Create a Post</h2>
         <form id="postForm">
