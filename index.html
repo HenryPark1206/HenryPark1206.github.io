@@ -109,6 +109,7 @@
       margin-top: 20px;
       border-top: 1px solid #eee;
       padding-top: 15px;
+      position: relative;
     }
 
     .post img {
@@ -125,18 +126,19 @@
     }
 
     .delete-btn {
-      background-color: #e74c3c;
-      color: white;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: transparent;
       border: none;
-      border-radius: 5px;
-      padding: 5px 10px;
-      font-size: 0.9em;
+      font-size: 1.2em;
       cursor: pointer;
-      margin-top: 10px;
+      color: #888;
+      transition: color 0.3s;
     }
 
     .delete-btn:hover {
-      background-color: #c0392b;
+      color: #e74c3c;
     }
   </style>
 </head>
@@ -249,12 +251,13 @@
 
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'delete-btn';
-      deleteBtn.textContent = 'Delete';
+      deleteBtn.innerHTML = '🗑️';
       deleteBtn.onclick = () => {
         postDiv.remove();
         deletePost(post.timestamp);
       };
 
+      postDiv.appendChild(deleteBtn);
       postDiv.appendChild(titleEl);
       postDiv.appendChild(contentEl);
 
@@ -265,7 +268,6 @@
       }
 
       postDiv.appendChild(timestampEl);
-      postDiv.appendChild(deleteBtn);
       postsContainer.prepend(postDiv);
     }
   </script>
