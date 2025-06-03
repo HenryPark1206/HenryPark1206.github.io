@@ -17,7 +17,6 @@
       color: white;
       padding: 40px 20px;
       text-align: center;
-      position: relative;
     }
 
     nav {
@@ -124,6 +123,21 @@
       color: #888;
       margin-top: 5px;
     }
+
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 0.9em;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
   </style>
 </head>
 <body>
@@ -170,6 +184,12 @@
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
+    // Load posts from localStorage on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
+      savedPosts.forEach(post => renderPost(post));
+    });
+
     form.addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -178,39 +198,76 @@
       const imageInput = document.getElementById('postImage');
       const time = new Date().toLocaleString();
 
-      const postDiv = document.createElement('div');
-      postDiv.className = 'post';
-
-      const titleEl = document.createElement('h3');
-      titleEl.textContent = title;
-
-      const contentEl = document.createElement('p');
-      contentEl.textContent = content;
-
-      const timestamp = document.createElement('div');
-      timestamp.className = 'timestamp';
-      timestamp.textContent = `Posted on ${time}`;
-
-      postDiv.appendChild(titleEl);
-      postDiv.appendChild(contentEl);
+      const newPost = {
+        title,
+        content,
+        timestamp: time,
+        image: ''
+      };
 
       if (imageInput.files && imageInput.files[0]) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          postDiv.appendChild(img);
-          postDiv.appendChild(timestamp);
-          postsContainer.prepend(postDiv);
+          newPost.image = e.target.result;
+          savePost(newPost);
+          renderPost(newPost);
         };
         reader.readAsDataURL(imageInput.files[0]);
       } else {
-        postDiv.appendChild(timestamp);
-        postsContainer.prepend(postDiv);
+        savePost(newPost);
+        renderPost(newPost);
       }
 
       form.reset();
     });
+
+    function savePost(post) {
+      const posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts.unshift(post); // add to beginning
+      localStorage.setItem('posts', JSON.stringify(posts));
+    }
+
+    function deletePost(timestamp) {
+      let posts = JSON.parse(localStorage.getItem('posts')) || [];
+      posts = posts.filter(post => post.timestamp !== timestamp);
+      localStorage.setItem('posts', JSON.stringify(posts));
+    }
+
+    function renderPost(post) {
+      const postDiv = document.createElement('div');
+      postDiv.className = 'post';
+
+      const titleEl = document.createElement('h3');
+      titleEl.textContent = post.title;
+
+      const contentEl = document.createElement('p');
+      contentEl.textContent = post.content;
+
+      const timestampEl = document.createElement('div');
+      timestampEl.className = 'timestamp';
+      timestampEl.textContent = `Posted on ${post.timestamp}`;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.onclick = () => {
+        postDiv.remove();
+        deletePost(post.timestamp);
+      };
+
+      postDiv.appendChild(titleEl);
+      postDiv.appendChild(contentEl);
+
+      if (post.image) {
+        const img = document.createElement('img');
+        img.src = post.image;
+        postDiv.appendChild(img);
+      }
+
+      postDiv.appendChild(timestampEl);
+      postDiv.appendChild(deleteBtn);
+      postsContainer.prepend(postDiv);
+    }
   </script>
 
 </body>
