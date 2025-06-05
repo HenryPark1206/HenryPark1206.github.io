@@ -65,10 +65,6 @@
       position: relative;
     }
 
-    section::before {
-      display: none;
-    }
-
     h2 {
       border-bottom: 2px solid #007acc;
       padding-bottom: 10px;
@@ -87,6 +83,7 @@
     }
 
     input[type="text"],
+    input[type="password"],
     textarea {
       padding: 10px;
       border: 1px solid #ccc;
@@ -159,6 +156,12 @@
       pointer-events: none;
     }
 
+    .comments {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+
     footer {
       text-align: center;
       padding: 40px 10px;
@@ -202,8 +205,8 @@
       <section id="projects">
         <h2>Projects</h2>
         <ul>
+          <!-- Example projects -->
           <!-- <li><a href="https://github.com/yourusername/project1">Project 1</a> – A cool tool I built to automate tasks.</li> -->
-          <!-- <li><a href="https://github.com/yourusername/project2">Project 2</a> – A lightweight framework for fast UI development.</li> -->
         </ul>
       </section>
     </div>
@@ -211,12 +214,18 @@
     <div class="right-column">
       <section id="post">
         <h2>Create a Post</h2>
-        <form id="postForm">
+        <div id="authSection">
+          <input type="password" id="postPassword" placeholder="Enter password to post">
+          <button onclick="unlockPostForm()">Unlock</button>
+        </div>
+
+        <form id="postForm" style="display:none;">
           <input type="text" id="postTitle" placeholder="Post Title" required>
           <textarea id="postContent" rows="5" placeholder="Write something..." required></textarea>
           <input type="file" id="postImage" accept="image/*">
           <button type="submit">Publish</button>
         </form>
+
         <div id="postsContainer"></div>
       </section>
     </div>
@@ -227,6 +236,7 @@
   </footer>
 
   <script>
+    const PASSWORD = "KRaPYrnEH12121206";
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
@@ -234,6 +244,16 @@
       const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
       savedPosts.forEach(post => renderPost(post));
     });
+
+    function unlockPostForm() {
+      const inputPass = document.getElementById('postPassword').value;
+      if (inputPass === PASSWORD) {
+        document.getElementById('authSection').style.display = 'none';
+        form.style.display = 'flex';
+      } else {
+        alert('❌ Incorrect password.');
+      }
+    }
 
     form.addEventListener('submit', function(event) {
       event.preventDefault();
@@ -247,7 +267,8 @@
         title,
         content,
         timestamp: time,
-        image: ''
+        image: '',
+        comments: []
       };
 
       if (imageInput.files && imageInput.files[0]) {
@@ -314,6 +335,53 @@
       }
 
       postDiv.appendChild(timestampEl);
+
+      // Comments Section
+      const commentsContainer = document.createElement('div');
+      commentsContainer.className = 'comments';
+
+      const commentsList = document.createElement('ul');
+      commentsList.style.paddingLeft = '20px';
+
+      if (post.comments && post.comments.length > 0) {
+        post.comments.forEach(comment => {
+          const li = document.createElement('li');
+          li.textContent = comment;
+          commentsList.appendChild(li);
+        });
+      }
+
+      const commentForm = document.createElement('form');
+      commentForm.style.marginTop = '10px';
+      commentForm.innerHTML = `
+        <input type="text" placeholder="Add a comment..." required style="width: 70%; padding: 5px; margin-right: 5px;">
+        <button type="submit" style="padding: 5px 10px;">Post</button>
+      `;
+
+      commentForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = commentForm.querySelector('input');
+        const comment = input.value.trim();
+        if (comment) {
+          const li = document.createElement('li');
+          li.textContent = comment;
+          commentsList.appendChild(li);
+          input.value = '';
+
+          let posts = JSON.parse(localStorage.getItem('posts')) || [];
+          const postIndex = posts.findIndex(p => p.timestamp === post.timestamp);
+          if (postIndex !== -1) {
+            posts[postIndex].comments = posts[postIndex].comments || [];
+            posts[postIndex].comments.push(comment);
+            localStorage.setItem('posts', JSON.stringify(posts));
+          }
+        }
+      });
+
+      commentsContainer.appendChild(commentsList);
+      commentsContainer.appendChild(commentForm);
+      postDiv.appendChild(commentsContainer);
+
       postsContainer.prepend(postDiv);
     }
   </script>
