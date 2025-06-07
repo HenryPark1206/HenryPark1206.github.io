@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <title>My GitHub Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Font Awesome for trash icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   <style>
+    /* All the CSS styling remains unchanged */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -237,8 +236,7 @@
       projectId: "githubpage-8c5c3",
       storageBucket: "githubpage-8c5c3.appspot.com",
       messagingSenderId: "142580769287",
-      appId: "1:142580769287:web:4fdbd7caa1e2b41174c0a2",
-      measurementId: "G-GX3MX9H6SJ"
+      appId: "1:142580769287:web:4fdbd7caa1e2b41174c0a2"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -247,14 +245,16 @@
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    async function loadPosts() {
       const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
       snapshot.forEach(doc => {
         const post = doc.data();
         post.id = doc.id;
         renderPost(post);
       });
-    });
+    }
+
+    window.addEventListener('DOMContentLoaded', loadPosts);
 
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
