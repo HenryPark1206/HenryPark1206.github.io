@@ -86,7 +86,6 @@
     }
 
     input[type="text"],
-    input[type="password"],
     textarea {
       padding: 10px;
       border: 1px solid #ccc;
@@ -214,12 +213,8 @@
     <div class="right-column">
       <section id="post">
         <h2>Create a Post</h2>
-        <div id="authSection">
-          <input type="password" id="postPassword" placeholder="Enter password to post">
-          <button onclick="unlockPostForm()">Unlock</button>
-        </div>
 
-        <form id="postForm" style="display:none;">
+        <form id="postForm">
           <input type="text" id="postTitle" placeholder="Post Title" required>
           <textarea id="postContent" rows="5" placeholder="Write something..." required></textarea>
           <input type="file" id="postImage" accept="image/*">
@@ -249,7 +244,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const PASSWORD = "KRaPYrnEH12121206";
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
@@ -261,16 +255,6 @@
         renderPost(post);
       });
     });
-
-    function unlockPostForm() {
-      const inputPass = document.getElementById('postPassword').value;
-      if (inputPass === PASSWORD) {
-        document.getElementById('authSection').style.display = 'none';
-        form.style.display = 'flex';
-      } else {
-        alert('❌ Incorrect password.');
-      }
-    }
 
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
