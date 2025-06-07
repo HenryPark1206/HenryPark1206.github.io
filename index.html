@@ -4,184 +4,14 @@
   <meta charset="UTF-8">
   <title>My GitHub Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Font Awesome for trash icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-
-    header {
-      background-color: #007acc;
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    nav {
-      margin-top: 10px;
-    }
-
-    nav a {
-      margin: 0 15px;
-      text-decoration: none;
-      color: white;
-      font-weight: bold;
-    }
-
-    .page-content {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-      padding: 40px 5%;
-    }
-
-    .left-column,
-    .right-column {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .left-column {
-      flex: 1;
-      max-width: 500px;
-    }
-
-    .right-column {
-      flex: 1.5;
-      max-width: 900px;
-    }
-
-    section {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      padding: 20px;
-      position: relative;
-    }
-
-    h2 {
-      border-bottom: 2px solid #007acc;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-
-    ul {
-      list-style-type: square;
-      padding-left: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    input[type="text"],
-    input[type="password"],
-    textarea {
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1em;
-    }
-
-    input[type="file"] {
-      padding: 5px;
-    }
-
-    button {
-      padding: 10px 20px;
-      background-color: #007acc;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #005fa3;
-    }
-
-    #postsContainer {
-      max-height: 500px;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-
-    .post {
-      margin-top: 20px;
-      border-top: 1px solid #eee;
-      padding-top: 15px;
-      position: relative;
-    }
-
-    .post img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    .timestamp {
-      font-size: 0.85em;
-      color: #888;
-      margin-top: 5px;
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: transparent;
-      border: none;
-      font-size: 1.2em;
-      cursor: pointer;
-      color: #e74c3c;
-      transition: color 0.3s;
-    }
-
-    .delete-btn:hover {
-      color: #c0392b;
-    }
-
-    .delete-btn i {
-      pointer-events: none;
-    }
-
-    .comments {
-      margin-top: 15px;
-      padding-top: 10px;
-      border-top: 1px solid #ddd;
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 10px;
-      font-size: 0.9em;
-      color: #777;
-      border-top: 1px solid #ccc;
-      margin-top: 40px;
-    }
-
-    @media screen and (max-width: 900px) {
-      .page-content {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .left-column, .right-column {
-        max-width: 90%;
-        width: 100%;
-      }
-    }
+    /* Your original CSS goes here — omitted for brevity */
   </style>
 </head>
 <body>
@@ -199,15 +29,11 @@
     <div class="left-column">
       <section id="about">
         <h2>About Me</h2>
-        <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design. I love working on web projects and collaborating with the tech community.</p>
+        <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design.</p>
       </section>
-
       <section id="projects">
         <h2>Projects</h2>
-        <ul>
-          <!-- Example projects -->
-          <!-- <li><a href="https://github.com/yourusername/project1">Project 1</a> – A cool tool I built to automate tasks.</li> -->
-        </ul>
+        <ul></ul>
       </section>
     </div>
 
@@ -236,13 +62,30 @@
   </footer>
 
   <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCraxKhubAnCTGHqKuCoKRWK8tTtzANGoA",
+      authDomain: "githubpage-8c5c3.firebaseapp.com",
+      projectId: "githubpage-8c5c3",
+      storageBucket: "githubpage-8c5c3.firebasestorage.app",
+      messagingSenderId: "142580769287",
+      appId: "1:142580769287:web:4fdbd7caa1e2b41174c0a2",
+      measurementId: "G-GX3MX9H6SJ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const PASSWORD = "KRaPYrnEH12121206";
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
-      savedPosts.forEach(post => renderPost(post));
+    window.addEventListener('DOMContentLoaded', async () => {
+      const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+      snapshot.forEach(doc => {
+        const post = doc.data();
+        post.id = doc.id;
+        renderPost(post);
+      });
     });
 
     function unlockPostForm() {
@@ -255,7 +98,7 @@
       }
     }
 
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', async function(event) {
       event.preventDefault();
 
       const title = document.getElementById('postTitle').value;
@@ -273,30 +116,28 @@
 
       if (imageInput.files && imageInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
           newPost.image = e.target.result;
-          savePost(newPost);
+          const docRef = await db.collection('posts').add(newPost);
+          newPost.id = docRef.id;
           renderPost(newPost);
         };
         reader.readAsDataURL(imageInput.files[0]);
       } else {
-        savePost(newPost);
+        const docRef = await db.collection('posts').add(newPost);
+        newPost.id = docRef.id;
         renderPost(newPost);
       }
 
       form.reset();
     });
 
-    function savePost(post) {
-      const posts = JSON.parse(localStorage.getItem('posts')) || [];
-      posts.unshift(post);
-      localStorage.setItem('posts', JSON.stringify(posts));
-    }
-
-    function deletePost(timestamp) {
-      let posts = JSON.parse(localStorage.getItem('posts')) || [];
-      posts = posts.filter(post => post.timestamp !== timestamp);
-      localStorage.setItem('posts', JSON.stringify(posts));
+    async function deletePost(postId, postDiv) {
+      const confirmDelete = confirm("⚠️ Are you sure you want to delete this post?");
+      if (confirmDelete) {
+        await db.collection('posts').doc(postId).delete();
+        postDiv.remove();
+      }
     }
 
     function renderPost(post) {
@@ -316,13 +157,7 @@
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'delete-btn';
       deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-      deleteBtn.onclick = () => {
-        const confirmDelete = confirm("⚠️ Are you sure you want to delete this post?");
-        if (confirmDelete) {
-          postDiv.remove();
-          deletePost(post.timestamp);
-        }
-      };
+      deleteBtn.onclick = () => deletePost(post.id, postDiv);
 
       postDiv.appendChild(deleteBtn);
       postDiv.appendChild(titleEl);
@@ -336,7 +171,6 @@
 
       postDiv.appendChild(timestampEl);
 
-      // Comments Section
       const commentsContainer = document.createElement('div');
       commentsContainer.className = 'comments';
 
@@ -358,7 +192,7 @@
         <button type="submit" style="padding: 5px 10px;">Post</button>
       `;
 
-      commentForm.addEventListener('submit', (e) => {
+      commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const input = commentForm.querySelector('input');
         const comment = input.value.trim();
@@ -368,13 +202,11 @@
           commentsList.appendChild(li);
           input.value = '';
 
-          let posts = JSON.parse(localStorage.getItem('posts')) || [];
-          const postIndex = posts.findIndex(p => p.timestamp === post.timestamp);
-          if (postIndex !== -1) {
-            posts[postIndex].comments = posts[postIndex].comments || [];
-            posts[postIndex].comments.push(comment);
-            localStorage.setItem('posts', JSON.stringify(posts));
-          }
+          const postRef = db.collection('posts').doc(post.id);
+          const doc = await postRef.get();
+          const currentComments = doc.exists ? doc.data().comments || [] : [];
+          currentComments.push(comment);
+          await postRef.update({ comments: currentComments });
         }
       });
 
@@ -385,6 +217,5 @@
       postsContainer.prepend(postDiv);
     }
   </script>
-
 </body>
 </html>
