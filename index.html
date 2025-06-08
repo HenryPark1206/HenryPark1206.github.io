@@ -8,12 +8,19 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   <style>
-    /* All the CSS styling remains unchanged */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       background-color: #f9f9f9;
       color: #333;
+    }
+
+    #errorDisplay {
+      background: #ffdddd;
+      color: #900;
+      padding: 10px;
+      display: none;
+      text-align: center;
     }
 
     header {
@@ -187,6 +194,8 @@
 </head>
 <body>
 
+  <div id="errorDisplay"></div>
+
   <header>
     <h1>Welcome to My GitHub Page</h1>
     <nav>
@@ -245,20 +254,24 @@
     const form = document.getElementById('postForm');
     const postsContainer = document.getElementById('postsContainer');
 
-    async function loadPosts() {
-  try {
-    const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
-    snapshot.forEach(doc => {
-      const post = doc.data();
-      post.id = doc.id;
-      renderPost(post);
-    });
-  } catch (error) {
-    alert("Error loading posts: " + error.message);
-    document.body.innerHTML += `<p style="color:red;">Error loading posts: ${error.message}</p>`;
-  }
-}
+    function showError(message) {
+      const errorDiv = document.getElementById('errorDisplay');
+      errorDiv.textContent = "⚠️ " + message;
+      errorDiv.style.display = 'block';
+    }
 
+    async function loadPosts() {
+      try {
+        const snapshot = await db.collection('posts').orderBy('timestamp', 'desc').get();
+        snapshot.forEach(doc => {
+          const post = doc.data();
+          post.id = doc.id;
+          renderPost(post);
+        });
+      } catch (error) {
+        showError("Error loading posts: " + error.message);
+      }
+    }
 
     window.addEventListener('DOMContentLoaded', loadPosts);
 
@@ -278,26 +291,34 @@
         comments: []
       };
 
-      if (imageInput.files && imageInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-          newPost.image = e.target.result;
+      try {
+        if (imageInput.files && imageInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = async function(e) {
+            newPost.image = e.target.result;
+            const docRef = await db.collection('posts').add(newPost);
+            newPost.id = docRef.id;
+            renderPost(newPost);
+          };
+          reader.readAsDataURL(imageInput.files[0]);
+        } else {
           const docRef = await db.collection('posts').add(newPost);
           newPost.id = docRef.id;
           renderPost(newPost);
-        };
-        reader.readAsDataURL(imageInput.files[0]);
-      } else {
-        const docRef = await db.collection('posts').add(newPost);
-        newPost.id = docRef.id;
-        renderPost(newPost);
+        }
+      } catch (error) {
+        showError("Error publishing post: " + error.message);
       }
 
       form.reset();
     });
 
     async function deletePost(postId) {
-      await db.collection('posts').doc(postId).delete();
+      try {
+        await db.collection('posts').doc(postId).delete();
+      } catch (error) {
+        showError("Error deleting post: " + error.message);
+      }
     }
 
     function renderPost(post) {
@@ -368,11 +389,15 @@
           commentsList.appendChild(li);
           input.value = '';
 
-          const postRef = db.collection('posts').doc(post.id);
-          const doc = await postRef.get();
-          const currentComments = doc.exists ? doc.data().comments || [] : [];
-          currentComments.push(comment);
-          await postRef.update({ comments: currentComments });
+          try {
+            const postRef = db.collection('posts').doc(post.id);
+            const doc = await postRef.get();
+            const currentComments = doc.exists ? doc.data().comments || [] : [];
+            currentComments.push(comment);
+            await postRef.update({ comments: currentComments });
+          } catch (error) {
+            showError("Error saving comment: " + error.message);
+          }
         }
       });
 
