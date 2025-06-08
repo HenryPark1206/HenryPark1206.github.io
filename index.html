@@ -30,10 +30,6 @@
       text-align: center;
     }
 
-    nav {
-      margin-top: 10px;
-    }
-
     nav a {
       margin: 0 15px;
       text-decoration: none;
@@ -80,19 +76,13 @@
       margin-bottom: 20px;
     }
 
-    ul {
-      list-style-type: square;
-      padding-left: 20px;
-    }
-
     form {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    input[type="text"],
-    textarea {
+    input[type="text"], textarea {
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
@@ -153,15 +143,10 @@
       font-size: 1.2em;
       cursor: pointer;
       color: #e74c3c;
-      transition: color 0.3s;
     }
 
     .delete-btn:hover {
       color: #c0392b;
-    }
-
-    .delete-btn i {
-      pointer-events: none;
     }
 
     .comments {
@@ -209,7 +194,7 @@
     <div class="left-column">
       <section id="about">
         <h2>About Me</h2>
-        <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design. I love working on web projects and collaborating with the tech community.</p>
+        <p>Hello! I'm a developer passionate about open-source, clean code, and creative UI design.</p>
       </section>
 
       <section id="projects">
@@ -221,14 +206,12 @@
     <div class="right-column">
       <section id="post">
         <h2>Create a Post</h2>
-
         <form id="postForm">
           <input type="text" id="postTitle" placeholder="Post Title" required>
           <textarea id="postContent" rows="5" placeholder="Write something..." required></textarea>
           <input type="file" id="postImage" accept="image/*">
           <button type="submit">Publish</button>
         </form>
-
         <div id="postsContainer"></div>
       </section>
     </div>
@@ -278,10 +261,17 @@
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
 
-      const title = document.getElementById('postTitle').value;
-      const content = document.getElementById('postContent').value;
+      const title = document.getElementById('postTitle').value.trim();
+      const content = document.getElementById('postContent').value.trim();
       const imageInput = document.getElementById('postImage');
       const time = new Date().toLocaleString();
+
+      if (!title || !content) {
+        showError("Please fill in both title and content.");
+        return;
+      }
+
+      alert("Submitting:\nTitle: " + title + "\nContent: " + content + "\nTime: " + time);
 
       const newPost = {
         title,
