@@ -5,8 +5,11 @@
   <title>My GitHub Page</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  
+  <!-- ✅ Fixed Firebase scripts: use compat versions -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -209,7 +212,11 @@
         <form id="postForm">
           <input type="text" id="postTitle" placeholder="Post Title" required>
           <textarea id="postContent" rows="5" placeholder="Write something..." required></textarea>
+          
+          <!-- ✅ Accessible file input -->
+          <label for="postImage">Attach an image (optional):</label>
           <input type="file" id="postImage" accept="image/*">
+
           <button type="submit">Publish</button>
         </form>
         <div id="postsContainer"></div>
@@ -270,8 +277,6 @@
         showError("Please fill in both title and content.");
         return;
       }
-
-      alert("Submitting:\nTitle: " + title + "\nContent: " + content + "\nTime: " + time);
 
       const newPost = {
         title,
