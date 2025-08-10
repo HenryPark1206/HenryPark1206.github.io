@@ -257,12 +257,31 @@
     const errorDiv = document.getElementById('errorDisplay');
     errorDiv.textContent = "⚠️ " + message;
     errorDiv.style.display = 'block';
-    // Auto-hide after a bit
     setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
   }
 
   function clearPosts() {
     postsContainer.innerHTML = '';
+  }
+
+  function nowTs() {
+    return Date.now();
+  }
+
+  // Convert legacy string comments to objects {name, text, ts}
+  function normalizeComments(arr) {
+    const a = Array.isArray(arr) ? arr : [];
+    return a.map((c, idx) => {
+      if (typeof c === 'string') {
+        return { name: 'Guest', text: c, ts: nowTs() + idx }; // stable-ish unique
+      }
+      // already object; ensure fields
+      return {
+        name: (c && typeof c.name === 'string' && c.name.trim()) ? c.name.trim() : 'Guest',
+        text: (c && typeof c.text === 'string') ? c.text : String(c ?? ''),
+        ts: (c && typeof c.ts === 'number') ? c.ts : nowTs()
+      };
+    });
   }
 
   // ================================
@@ -284,7 +303,7 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     loadPosts();
-    addRandomProject(); // ✅ keep your example project adder
+    addRandomProject(); // keep your example project adder
   });
 
   // ================================
@@ -302,12 +321,11 @@
   }
 
   // ================================
-  // Create post (kept, with publish password)
+  // Create post (password-protected)
   // ================================
   form.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    // ✅ password check for publishing
     const password = prompt("🔒 Enter password to publish:");
     if (password !== "qkrtlgn121206") {
       showError("❌ Incorrect password. Post not published.");
@@ -329,7 +347,7 @@
       content,
       timestamp: time,
       image: '',
-      comments: []
+      comments: [] // will store [{name, text, ts}]
     };
 
     try {
@@ -355,7 +373,7 @@
   });
 
   // ================================
-  // Delete a post (now password-protected)
+  // Delete a post (password-protected)
   // ================================
   async function deletePost(postId) {
     try {
@@ -366,9 +384,12 @@
   }
 
   // ================================
-  // Comments UI builder (new)
+  // Comments UI (with names + delete)
   // ================================
   function createCommentsUI(post) {
+    // local state for this post's comments (normalized)
+    let commentsState = normalizeComments(post.comments);
+
     // Wrapper
     const commentsContainer = document.createElement('div');
     commentsContainer.className = 'comments';
@@ -396,7 +417,7 @@
     badge.style.borderRadius = '999px';
     badge.style.background = '#eef6ff';
     badge.style.color = '#1e40af';
-    badge.textContent = (post.comments?.length || 0) + '';
+    badge.textContent = String(commentsState.length);
 
     left.appendChild(title);
     left.appendChild(badge);
@@ -420,6 +441,7 @@
 
     // List
     const listWrapper = document.createElement('div');
+
     const commentsList = document.createElement('ul');
     commentsList.style.listStyle = 'none';
     commentsList.style.padding = '0';
@@ -428,20 +450,20 @@
     commentsList.style.flexDirection = 'column';
     commentsList.style.gap = '10px';
 
-    // Empty state
     const emptyState = document.createElement('div');
     emptyState.style.color = '#6b7280';
     emptyState.style.fontSize = '0.95em';
     emptyState.style.padding = '8px 0';
     emptyState.textContent = 'No comments yet. Be the first to say something!';
-    emptyState.style.display = (post.comments && post.comments.length > 0) ? 'none' : 'block';
+    emptyState.style.display = commentsState.length > 0 ? 'none' : 'block';
 
-    // Render existing comments
-    function addCommentLi(text) {
+    // Utility: render one comment row
+    function renderCommentItem(c) {
       const li = document.createElement('li');
       li.style.display = 'flex';
       li.style.gap = '10px';
       li.style.alignItems = 'flex-start';
+      li.dataset.ts = String(c.ts);
 
       const avatar = document.createElement('div');
       avatar.textContent = '💬';
@@ -450,7 +472,6 @@
       avatar.style.textAlign = 'center';
 
       const bubble = document.createElement('div');
-      bubble.textContent = text;
       bubble.style.background = '#f3f4f6';
       bubble.style.border = '1px solid #e5e7eb';
       bubble.style.borderRadius = '8px';
@@ -458,25 +479,79 @@
       bubble.style.flex = '1';
       bubble.style.color = '#111827';
       bubble.style.lineHeight = '1.35';
+      bubble.textContent = `(${c.name}): ${c.text}`;
+
+      // delete button
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.title = 'Delete comment';
+      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      delBtn.style.border = 'none';
+      delBtn.style.background = 'transparent';
+      delBtn.style.color = '#e11d48';
+      delBtn.style.cursor = 'pointer';
+      delBtn.style.fontSize = '14px';
+      delBtn.style.marginLeft = '6px';
+      delBtn.addEventListener('mouseenter', () => delBtn.style.color = '#be123c');
+      delBtn.addEventListener('mouseleave', () => delBtn.style.color = '#e11d48');
+
+      delBtn.addEventListener('click', async () => {
+        if (!confirm('Delete this comment?')) return;
+
+        // Remove from local state
+        commentsState = commentsState.filter(x => x.ts !== c.ts);
+
+        // Optimistic UI update
+        li.remove();
+        badge.textContent = String(commentsState.length);
+        if (commentsState.length === 0) emptyState.style.display = 'block';
+
+        try {
+          // Persist to Firestore
+          const postRef = db.collection('posts').doc(post.id);
+          await postRef.update({ comments: commentsState });
+        } catch (error) {
+          showError("Error deleting comment: " + error.message);
+        }
+      });
+
+      const rightWrap = document.createElement('div');
+      rightWrap.style.display = 'flex';
+      rightWrap.style.alignItems = 'center';
+      rightWrap.style.gap = '6px';
+      rightWrap.style.flex = '1';
+
+      rightWrap.appendChild(bubble);
+      rightWrap.appendChild(delBtn);
 
       li.appendChild(avatar);
-      li.appendChild(bubble);
+      li.appendChild(rightWrap);
       commentsList.appendChild(li);
     }
 
-    (post.comments || []).forEach(addCommentLi);
+    // Initial render
+    commentsState.forEach(renderCommentItem);
 
-    // Input row
+    // Input row (name + comment)
     const formRow = document.createElement('form');
-    formRow.style.display = 'flex';
+    formRow.style.display = 'grid';
+    formRow.style.gridTemplateColumns = '160px 1fr auto';
     formRow.style.gap = '8px';
     formRow.style.marginTop = '12px';
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.placeholder = 'Your name';
+    nameInput.required = true;
+    nameInput.style.padding = '10px';
+    nameInput.style.border = '1px solid #d1d5db';
+    nameInput.style.borderRadius = '8px';
+    nameInput.style.fontSize = '14px';
 
     const input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Add a comment...';
     input.required = true;
-    input.style.flex = '1';
     input.style.padding = '10px';
     input.style.border = '1px solid #d1d5db';
     input.style.borderRadius = '8px';
@@ -495,6 +570,7 @@
     submitBtn.addEventListener('mouseenter', () => submitBtn.style.background = '#005fa3');
     submitBtn.addEventListener('mouseleave', () => submitBtn.style.background = '#007acc');
 
+    formRow.appendChild(nameInput);
     formRow.appendChild(input);
     formRow.appendChild(submitBtn);
 
@@ -502,7 +578,7 @@
     let visible = true;
     function updateVisibility() {
       listWrapper.style.display = visible ? 'block' : 'none';
-      formRow.style.display = visible ? 'flex' : 'none';
+      formRow.style.display = visible ? 'grid' : 'none';
       toggleBtn.textContent = visible ? 'Hide' : 'Show';
     }
     toggleBtn.addEventListener('click', () => {
@@ -513,21 +589,23 @@
     // Submit behavior
     formRow.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const comment = input.value.trim();
-      if (!comment) return;
+      const name = (nameInput.value || '').trim() || 'Guest';
+      const text = (input.value || '').trim();
+      if (!text) return;
+
+      const newItem = { name, text, ts: nowTs() };
 
       // Optimistic UI
       if (emptyState.style.display !== 'none') emptyState.style.display = 'none';
-      addCommentLi(comment);
+      commentsState.push(newItem);
+      renderCommentItem(newItem);
+      nameInput.value = '';
       input.value = '';
-      badge.textContent = String(parseInt(badge.textContent, 10) + 1);
+      badge.textContent = String(commentsState.length);
 
       try {
         const postRef = db.collection('posts').doc(post.id);
-        const doc = await postRef.get();
-        const currentComments = doc.exists ? (doc.data().comments || []) : [];
-        currentComments.push(comment);
-        await postRef.update({ comments: currentComments });
+        await postRef.update({ comments: commentsState });
       } catch (error) {
         showError("Error saving comment: " + error.message);
       }
